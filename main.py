@@ -85,7 +85,7 @@ def foodie():
         # food
             url = "https://api.nal.usda.gov/fdc/v1/foods/search"
             params = {
-            'api_key': os.getenv('api_key'),  # Replace with your API key
+            'api_key': os.environ.get('api_key'),  # Replace with your API key
             'query': product,  # Replace with any other required parameters
             }
 
