@@ -98,7 +98,7 @@ def foodie():
                 items = data['foods']  
                 top_5_list={}
             
-                while len(top_5_list)<5:
+                while len(top_5_list) < 5:
                     item=items[len(top_5_list)]
                     item_name= item['description'] 
                     if item_name not in top_5_list:
@@ -107,7 +107,7 @@ def foodie():
                 return jsonify(top_5_list)
                 
             else:
-                print('API request failed:', r.status_code)
+                return 'API request failed: ' + str(r.status_code) + str(os.environ.get('api_key'))
         except Exception as e:
             return str(e)
 
