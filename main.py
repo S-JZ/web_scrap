@@ -2,22 +2,32 @@ from flask import Flask, request, jsonify
 import requests
 from model import *
 from bs4 import BeautifulSoup
-# from collections import defaultdict
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 app = Flask(__name__)
 
-@app.route("/final_prod", methods=["GET", "POST"])
+@app.route("/final-prod", methods=["GET", "POST"])
 def final_p():
     if request.method == "POST":
+        category = request.form.get("category")
         product = request.form.get("product_name")
-        all_ing= request.form.getlist("my_list[]")
-        print(product)
-        print(all_ing)
+        all_ing = request.form.get("ingredients").split("; ")
+        sub_category = request.form.get("sub_category")
         if product is None:
             return "product name not found"
         try:
+            if category == "cosmetics":
+                sub_category = str(get_cluster(category, product))
+            else:
+                sub_category = str(get_cluster(category, sub_category))
             ingredients, exempts = generate_ings_exempts(all_ing)
             compounds, left = get_compounds(ingredients)
             summary = get_summary(compounds, exempts, left)
+            summary['sub_category'] = sub_category
             return jsonify(summary)
 
         except Exception as e:
@@ -59,9 +69,6 @@ def home():
                 # all_ing = ()
                 for li in soup.find_all("a", class_="ingred-link black"):
                     top_5_list[prod_name].append(li.text.lower())
-           
-            # print(top_5_list)  
-           
             
             return jsonify(top_5_list)
         except Exception as e:
@@ -78,7 +85,7 @@ def foodie():
         # food
             url = "https://api.nal.usda.gov/fdc/v1/foods/search"
             params = {
-            'api_key': '',  # Replace with your API key
+            'api_key': os.getenv('api_key'),  # Replace with your API key
             'query': product,  # Replace with any other required parameters
             }
 
@@ -104,49 +111,6 @@ def foodie():
         except Exception as e:
             return str(e)
 
-# @app.route("/foo", methods=["GET", "POST"])
-# def data():
-#     if request.method == "POST":
-#         product = request.form.get("product_name")
-#         if product is None:
-#             return "product name not found"
-#         try:
-#         # food
-#             url = "https://in.openfoodfacts.org/"
-#             x = product.split()
-#             after_join = "+".join(x)
-#             url2 = (
-#                 url
-#                 + "cgi/search.pl?search_terms={}".format(after_join)
-#                 + "&search_simple=1&action=process"
-#             )
-#             r = requests.get(url2)
-#             htmlContent = r.text
-#             soup = BeautifulSoup(htmlContent, "html.parser")
-
-#             links = soup.find("ul", class_="products")
-#             ingredients = None
-#             i = 0
-#             while ingredients == None:
-#                 link = links.find_all("li")[i]
-#                 i += 1
-#                 anchors = link.find("a")
-#                 specific = anchors["href"]
-#                 final_prod_name=anchors.text
-#                 print(final_prod_name)
-#                 details = requests.get(url + specific[1:])
-#                 soup = BeautifulSoup(details.text, "html.parser")
-#                 ingredients = soup.find("ol", id="ordered_ingredients_list")
-
-#             all_ing = set()
-#             for li in ingredients.find_all("span"):
-#                 all_ing.add(li.text.lower())
-#             ingredients, exempts = generate_ings_exempts(list(all_ing))
-#             compounds, left = get_compounds(ingredients)
-#             summary = get_summary(compounds, exempts, left)
-#             return jsonify(summary)
-#         except Exception as e:
-#             return str(e)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8080)

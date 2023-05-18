@@ -2,6 +2,8 @@ import deepchem as dc
 import pubchempy as pcp
 from rdkit import Chem
 import requests, json
+import joblib
+
 
 def get_compound_url(compound_name):
     # fetch PubChem CID for the given compound name
@@ -31,8 +33,12 @@ tox21_tasks = ['NR-AR',
  'SR-p53']
 
 
-model = dc.models.GraphConvModel(len(tox21_tasks), mode='classification', model_dir='tox_pred')
+model = dc.models.GraphConvModel(len(tox21_tasks), mode='classification', model_dir='models/tox_pred')
 model.restore()
+cosmetic_rec = joblib.load('models/recommender.sav')
+cosmetic_tfid = joblib.load('models/tfidf_vectorizer.sav')
+food_rec = joblib.load('models/recommender2.sav')
+food_tfid = joblib.load('models/tfidf_vectorizer2.sav')
 
 environment_task = ['NR-AhR', 'NR-PPAR-gamma', 'SR-ARE', 'SR-ATAD5', 'SR-HSE', 'SR-MMP', 'SR-p53']
 aquatic_task = ['NR-Aromatase', 'NR-ER', 'NR-ER-LBD', 'NR-PPAR-gamma', 'SR-ARE', 'SR-ATAD5', 'SR-HSE', 'SR-MMP']
@@ -102,3 +108,11 @@ def get_summary(compounds, exempts, left):
     for ing in left:
         summary[ing.capitalize()] = ['-1', '-1', ""]
     return summary
+
+
+def get_cluster(product_type, info):
+    if product_type == 'food':
+        return food_rec.predict(food_tfid.transform([info]))[0]
+    else:
+        return cosmetic_rec.predict(cosmetic_tfid.transform([info]))[0]
+

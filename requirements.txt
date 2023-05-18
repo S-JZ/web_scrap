@@ -2,6 +2,7 @@ beautifulsoup4
 bs4
 certifi
 charset-normalizer
+dot-env
 click
 colorama
 deepchem==2.7.1
