@@ -102,7 +102,9 @@ def foodie():
                     item=items[len(top_5_list)]
                     item_name= item['description'] 
                     if item_name not in top_5_list:
-                        top_5_list[item_name]=item['ingredients'].lower()
+                        top_5_list[item_name]=[]
+                        top_5_list[item_name].append(item['foodCategory'])
+                        top_5_list[item_name].append(item['ingredients'].lower())
                 
                 return jsonify(top_5_list)
                 
