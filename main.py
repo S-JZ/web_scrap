@@ -87,6 +87,12 @@ def foodie():
             params = {
             'api_key': os.environ.get('api_key'),  # Replace with your API key
             'query': product,  # Replace with any other required parameters
+            "dataType": [
+                    "Branded"
+                    # "Foundation",
+                    # "SR Legacy"
+                    ],
+            "pageNumber": 2,
             }
 
             
@@ -94,13 +100,20 @@ def foodie():
       
             if r.status_code == 200: 
                 data = r.json()  
-           
+                # return data
                 items = data['foods']  
                 top_5_list={}
-            
-                while len(top_5_list) < 5:
+                # count=0
+                foodcrit=data['foodSearchCriteria']
+                count=foodcrit['numberOfResultsPerPage']
+                # print(count)
+                while len(top_5_list)<5 :
+                    if(count<=0) :
+                        break
+                    count-=1
                     item=items[len(top_5_list)]
                     item_name= item['description'] 
+                    # print(item_name)
                     if item_name not in top_5_list:
                         top_5_list[item_name]=[]
                         top_5_list[item_name].append(item['foodCategory'])
