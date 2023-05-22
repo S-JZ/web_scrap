@@ -123,7 +123,7 @@ def foodie():
                 return jsonify(top_5_list)
                 
             else:
-                return 'API request failed: ' + str(r.status_code) + str(os.environ.get('api_key'))
+                return 'API request failed: ' + str(r.status_code)
         except Exception as e:
             return str(e)
 
