@@ -92,7 +92,8 @@ def foodie():
                     # "Foundation",
                     # "SR Legacy"
                     ],
-            "pageNumber": 2,
+            "pageNumber": 1,
+            "numberOfResultsPerPage": 50,
             }
 
             
